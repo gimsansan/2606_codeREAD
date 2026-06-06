@@ -1,6 +1,32 @@
-export default function PageEditor({ page, onUpdate }) {
+import { ETC_CATEGORY_NAME } from '../utils/categories'
+import { LANGUAGE_OPTIONS } from '../utils/languages'
+
+export default function PageEditor({
+  page,
+  onUpdate,
+  isDraft,
+  onSave,
+  onCancel,
+  categories,
+  draftCategoryId,
+  onCategoryChange,
+}) {
   return (
     <div className="page-editor">
+      {isDraft && (
+        <label className="field field-inline">
+          <span>카테고리</span>
+          <select value={draftCategoryId} onChange={(e) => onCategoryChange(e.target.value)}>
+            <option value="">{ETC_CATEGORY_NAME} (기본)</option>
+            {categories.map((cat) => (
+              <option key={cat.id} value={cat.id}>
+                {cat.name}
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
+
       <label className="field">
         <span>제목</span>
         <input
@@ -40,15 +66,24 @@ export default function PageEditor({ page, onUpdate }) {
           value={page.language}
           onChange={(e) => onUpdate('language', e.target.value)}
         >
-          <option value="js">JavaScript</option>
-          <option value="ts">TypeScript</option>
-          <option value="css">CSS</option>
-          <option value="py">Python</option>
-          <option value="react">React</option>
-          <option value="rn">React Native</option>
-          <option value="next">Next.js</option>
+          {LANGUAGE_OPTIONS.map((opt) => (
+            <option key={opt.value} value={opt.value}>
+              {opt.label}
+            </option>
+          ))}
         </select>
       </label>
+
+      {isDraft && (
+        <div className="page-editor-actions">
+          <button type="button" className="btn btn-primary btn-sm" onClick={onSave}>
+            저장
+          </button>
+          <button type="button" className="btn btn-ghost btn-sm" onClick={onCancel}>
+            취소
+          </button>
+        </div>
+      )}
     </div>
   )
 }

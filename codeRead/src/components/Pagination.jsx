@@ -1,4 +1,4 @@
-export default function Pagination({ current, total, onPrev, onNext, onGoTo }) {
+export default function Pagination({ current, total, onPrev, onNext }) {
   if (total === 0) return null
 
   return (
@@ -12,20 +12,9 @@ export default function Pagination({ current, total, onPrev, onNext, onGoTo }) {
         ← 이전
       </button>
 
-      <div className="page-dots">
-        {Array.from({ length: total }, (_, i) => (
-          <button
-            key={i}
-            type="button"
-            className={`page-dot ${i === current ? 'active' : ''}`}
-            onClick={() => onGoTo(i)}
-            aria-label={`${i + 1}페이지`}
-            aria-current={i === current ? 'page' : undefined}
-          >
-            {i + 1}
-          </button>
-        ))}
-      </div>
+      <span className="pagination-status" aria-live="polite">
+        {current + 1} / {total}
+      </span>
 
       <button
         type="button"

@@ -2,7 +2,7 @@ export const defaultNotebook = {
   categories: [
     {
       id: 'cat-js-async',
-      name: 'JS Async',
+      name: 'JS',
       pages: [
         {
           id: 'page-await-rule',
@@ -40,6 +40,10 @@ export const defaultNotebook = {
         },
       ],
     },
- 
+    {
+      id: 'cat-etc',
+      name: '기타',
+      pages: [],
+    },
   ],
 }
