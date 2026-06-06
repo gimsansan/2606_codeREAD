@@ -1,121 +1,111 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
+import { useNotebook } from './hooks/useNotebook'
+import CategorySidebar from './components/CategorySidebar'
+import PageViewer from './components/PageViewer'
+import PageEditor from './components/PageEditor'
+import Pagination from './components/Pagination'
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const {
+    activeCategory,
+    activeCategoryId,
+    activePage,
+    activePageIndex,
+    pages,
+    searchQuery,
+    setSearchQuery,
+    isEditing,
+    setIsEditing,
+    selectCategory,
+    goToPage,
+    updatePage,
+    addCategory,
+    addPage,
+    deletePage,
+    renameCategory,
+    resetNotebook,
+    filteredCategories,
+  } = useNotebook()
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
+    <div className="app">
+      <header className="header">
+        <div className="header-brand">
+          <h1>codeRead</h1>
+          <p className="tagline">복습용 코드 수첩</p>
         </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
+        <div className="header-actions">
+          <button
+            type="button"
+            className={`btn ${isEditing ? 'btn-active' : ''}`}
+            onClick={() => setIsEditing((v) => !v)}
+          >
+            {isEditing ? '보기' : '편집'}
+          </button>
+          <button type="button" className="btn" onClick={addPage}>
+            + 페이지
+          </button>
+          {isEditing && (
+            <button type="button" className="btn btn-danger" onClick={deletePage}>
+              삭제
+            </button>
+          )}
+          <button type="button" className="btn btn-ghost" onClick={resetNotebook}>
+            초기화
+          </button>
         </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+      </header>
 
-      <div className="ticks"></div>
+      <div className="layout">
+        <CategorySidebar
+          categories={filteredCategories}
+          activeCategoryId={activeCategoryId}
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          onSelectCategory={selectCategory}
+          onAddCategory={addCategory}
+        />
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+        <main className="main">
+          {!activePage ? (
+            <div className="empty-state">
+              <p>카테고리를 선택하거나 새로 만드세요.</p>
+            </div>
+          ) : (
+            <>
+              <div className="page-header">
+                {isEditing ? (
+                  <input
+                    className="category-rename"
+                    value={activeCategory?.name ?? ''}
+                    onChange={(e) => renameCategory(e.target.value)}
+                  />
+                ) : (
+                  <span className="category-label">{activeCategory?.name}</span>
+                )}
+                <h2 className="page-title">
+                  {isEditing ? null : activePage.title}
+                </h2>
+              </div>
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+              {isEditing ? (
+                <PageEditor page={activePage} onUpdate={updatePage} />
+              ) : (
+                <PageViewer page={activePage} />
+              )}
+
+              <Pagination
+                current={activePageIndex}
+                total={pages.length}
+                onPrev={() => goToPage(activePageIndex - 1)}
+                onNext={() => goToPage(activePageIndex + 1)}
+                onGoTo={goToPage}
+              />
+            </>
+          )}
+        </main>
+      </div>
+    </div>
   )
 }
 
