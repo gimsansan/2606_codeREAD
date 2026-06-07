@@ -10,7 +10,7 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['pwa-192.png', 'pwa-512.png'],
       manifest: {
-        name: 'SnippetNote — 복습용 코드 수첩',
+        name: 'SnippetNote',
         short_name: 'SnippetNote',
         description: '복습용 코드 수첩',
         theme_color: '#050508',
