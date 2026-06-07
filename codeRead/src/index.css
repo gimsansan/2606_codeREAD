@@ -1,31 +1,12 @@
-:root {
-  --text: #94a3b8;
-  --text-h: #f1f5f9;
-  --bg: rgba(10, 10, 18, 0.72);
-  --border: rgba(255, 255, 255, 0.1);
-  --code-bg: rgba(0, 0, 0, 0.45);
-  --accent: #22d3ee;
-  --accent-purple: #a78bfa;
-  --accent-bg: rgba(34, 211, 238, 0.1);
-  --accent-border: rgba(34, 211, 238, 0.45);
-  --social-bg: rgba(255, 255, 255, 0.04);
-  --glass-bg: rgba(255, 255, 255, 0.06);
-  --glass-bg-strong: rgba(255, 255, 255, 0.09);
-  --glass-border: rgba(255, 255, 255, 0.14);
-  --glass-blur: 20px;
-  --neon-glow: 0 0 20px rgba(34, 211, 238, 0.22);
-  --neon-glow-strong: 0 0 32px rgba(34, 211, 238, 0.38);
-  --shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+@import './themes.css';
 
+:root {
   --sans: 'Inter', system-ui, 'Segoe UI', sans-serif;
-  --heading: 'Inter', system-ui, sans-serif;
   --mono: 'JetBrains Mono', ui-monospace, Consolas, monospace;
 
   font: 16px/145% var(--sans);
   letter-spacing: 0.18px;
-  color-scheme: dark;
   color: var(--text);
-  background: #050508;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -39,20 +20,6 @@
 body {
   margin: 0;
   min-height: 100svh;
-  background: #050508;
-}
-
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background:
-    radial-gradient(ellipse 70vmax 50vmax at 5% 15%, rgba(167, 139, 250, 0.22), transparent 60%),
-    radial-gradient(ellipse 60vmax 45vmax at 95% 85%, rgba(34, 211, 238, 0.16), transparent 55%),
-    radial-gradient(ellipse 50vmax 40vmax at 50% 100%, rgba(99, 102, 241, 0.1), transparent 50%),
-    linear-gradient(165deg, #08080f 0%, #0c0c18 50%, #060610 100%);
 }
 
 #root {
@@ -65,7 +32,7 @@ body::before {
   flex-direction: column;
   background: transparent;
   border-inline: 1px solid var(--glass-border);
-  box-shadow: 0 0 80px rgba(34, 211, 238, 0.05);
+  box-shadow: var(--root-shadow);
 }
 
 h1,

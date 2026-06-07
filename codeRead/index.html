@@ -7,10 +7,19 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap"
       rel="stylesheet"
     />
     <title>codeRead — 복습용 코드 수첩</title>
+    <script>
+      (function () {
+        var t = localStorage.getItem('coderead-theme')
+        document.documentElement.setAttribute(
+          'data-theme',
+          t === 'glass' || t === 'editorial' || t === 'neon-glass' ? t : 'neon-glass',
+        )
+      })()
+    </script>
   </head>
   <body>
     <div id="root"></div>

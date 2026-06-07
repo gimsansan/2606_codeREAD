@@ -123,3 +123,105 @@ Viewer에서 title 없으면 **빈 h2** — `(제목 없음)` 표시 필요
 **이미 된 것:** 숨겨진 조작 힌트, code/comment 더블클릭 수정, 사이드바 접기, 검색 기록, 카테고리명 `...`, 좌측 검색 구분  @codeRead 
 
 *우측 카테고리 검색* 이것 적용해줘
+
+
+
+
+
+
+
+## 바탕화면 앱(PWA) — 직접 하기 순서
+
+### 0. 준비
+- `dev`(5173) **끄기** — PWA 테스트는 **4173 또는 배포 URL 하나**만
+- 작업 폴더: `d:\2605_month\2606_codeRead\codeRead`
+
+---
+
+### 1. PWA 패키지 설치
+```bash
+cd d:\2605_month\2606_codeRead\codeRead
+npm install -D vite-plugin-pwa
+```
+
+---
+
+### 2. `vite.config.js` 수정
+`vite-plugin-pwa` 추가 + manifest 설정.
+
+필수 항목:
+- `name`, `short_name` (예: SnippetNote)
+- `display: 'standalone'` ← 앱 창처럼 열림
+- `icons` — **192×192**, **512×512** PNG (아래 3번)
+
+공식 예시: [vite-plugin-pwa](https://vite-pwa-org.netlify.app/guide/)
+
+---
+
+### 3. 아이콘 추가
+`public/` 폴더에 PNG 넣기 (예):
+- `public/pwa-192.png`
+- `public/pwa-512.png`
+
+`icons.svg`를 PNG로 변환해도 됩니다. manifest의 `icons` 경로와 맞추세요.
+
+---
+
+### 4. Service Worker 등록 (`src/main.jsx`)
+```js
+import { registerSW } from 'virtual:pwa-register'
+
+registerSW({ immediate: true })
+```
+(또는 플러그인 문서의 `injectRegister: 'auto'` 방식)
+
+---
+
+### 5. 빌드 & 확인
+```bash
+npm run build
+npm run preview
+```
+브라우저에서 `http://localhost:4173/` 접속
+
+DevTools → **Application**:
+- **Manifest** 보이는지
+- **Service workers** 등록됐는지 확인
+
+---
+
+### 6. 바탕화면에 설치 (로컬)
+Chrome/Edge에서 `localhost:4173` 열고:
+- 주소창 **설치** 아이콘, 또는
+- 메뉴(⋮) → **앱 설치** / **Install SnippetNote**
+
+설치 후 시작 메뉴·바탕화면에서 앱처럼 실행.
+
+**주의:** 로컬 PWA는 **`npm run preview` 없으면** 처음엔 안 열릴 수 있음. 매번 서버 켜기 싫으면 **7번 배포**가 더 낫습니다.
+
+---
+
+### 7. (추천) 배포 후 설치 — 서버 없이 쓰기
+1. GitHub에 `codeRead` push  
+2. [Vercel](https://vercel.com) 또는 Netlify 연결  
+   - Root: `codeRead`  
+   - Build: `npm run build`  
+   - Output: `dist`  
+3. 배포 URL 접속 → **앱 설치**
+
+HTTPS + 고정 URL → **preview 매번 실행 불필요**.
+
+---
+
+### 8. 데이터
+- PWA도 **localStorage** (`coderead-notebook`)
+- **5173 / 4173 / 배포 URL** 은 각각 **데이터 분리**
+- 4173에서 쓰던 데이터 → 배포 후 **비어 보일 수 있음** (새 주소라서)
+
+---
+
+## 한 줄 요약
+
+**패키지 설치 → vite.config + 아이콘 → main.jsx 등록 → build → preview에서 설치 테스트 → (원하면) Vercel 배포 후 최종 설치**
+
+막히는 단계(2번 config 예시, 아이콘) 알려주시면 그 부분만 코드 예시 드리겠습니다.

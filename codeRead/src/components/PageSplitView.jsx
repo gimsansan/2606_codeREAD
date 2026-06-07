@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import { textToComments } from '../utils/comments'
 import { getLanguageLabel } from '../utils/languages'
 import HighlightedText from './HighlightedText'
 import HighlightedCode from './HighlightedCode'
@@ -16,6 +15,7 @@ export default function PageSplitView({
   const [draftText, setDraftText] = useState(text ?? '')
   const [isEditingCode, setIsEditingCode] = useState(false)
   const [draftCode, setDraftCode] = useState(code ?? '')
+  const [copiedPanel, setCopiedPanel] = useState(null)
 
   useEffect(() => {
     setIsEditingText(false)
@@ -27,9 +27,21 @@ export default function PageSplitView({
     setDraftCode(code ?? '')
   }, [code])
 
-  const comments = textToComments(text)
+  const displayText = text ?? ''
   const displayCode = code?.trim() ?? ''
   const languageLabel = language ? getLanguageLabel(language) : null
+
+  const copyToClipboard = async (content, panel) => {
+    const value = content?.trim()
+    if (!value) return
+    try {
+      await navigator.clipboard.writeText(value)
+      setCopiedPanel(panel)
+      setTimeout(() => setCopiedPanel(null), 1500)
+    } catch {
+      /* clipboard unavailable */
+    }
+  }
 
   const startTextEdit = () => {
     if (!onTextUpdate) return
@@ -108,17 +120,29 @@ export default function PageSplitView({
               />
             </code>
           </pre>
-          {onCodeUpdate && (
+          <div className="panel-actions">
             <button
               type="button"
-              className="panel-edit-hint"
-              onClick={startCodeEdit}
-              title="코드 수정"
-              aria-label="코드 수정"
+              className="panel-action-btn"
+              onClick={() => copyToClipboard(displayCode, 'code')}
+              disabled={!displayCode}
+              title="코드 복사"
+              aria-label="코드 복사"
             >
-              ✎ <span>더블클릭하여 수정</span>
+              {copiedPanel === 'code' ? '복사됨' : '복사'}
             </button>
-          )}
+            {onCodeUpdate && (
+              <button
+                type="button"
+                className="panel-action-btn"
+                onClick={startCodeEdit}
+                title="코드 수정"
+                aria-label="코드 수정"
+              >
+                ✎ <span>수정</span>
+              </button>
+            )}
+          </div>
         </div>
       )}
 
@@ -154,20 +178,32 @@ export default function PageSplitView({
             title={onTextUpdate ? '더블클릭하여 설명 수정' : undefined}
           >
             <code>
-              <HighlightedText text={comments || ' '} query={searchQuery} />
+              <HighlightedText text={displayText || ' '} query={searchQuery} />
             </code>
           </pre>
-          {onTextUpdate && (
+          <div className="panel-actions">
             <button
               type="button"
-              className="panel-edit-hint"
-              onClick={startTextEdit}
-              title="설명 수정"
-              aria-label="설명 수정"
+              className="panel-action-btn"
+              onClick={() => copyToClipboard(displayText, 'text')}
+              disabled={!displayText.trim()}
+              title="설명 복사"
+              aria-label="설명 복사"
             >
-              ✎ <span>더블클릭하여 수정</span>
+              {copiedPanel === 'text' ? '복사됨' : '복사'}
             </button>
-          )}
+            {onTextUpdate && (
+              <button
+                type="button"
+                className="panel-action-btn"
+                onClick={startTextEdit}
+                title="설명 수정"
+                aria-label="설명 수정"
+              >
+                ✎ <span>수정</span>
+              </button>
+            )}
+          </div>
         </div>
       )}
     </div>

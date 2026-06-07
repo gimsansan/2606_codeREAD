@@ -7,6 +7,8 @@ import PageEditor from './components/PageEditor'
 import Pagination from './components/Pagination'
 import PageNavList from './components/PageNavList'
 import SearchHistoryBar from './components/SearchHistoryBar'
+import ThemeToggle from './components/ThemeToggle'
+import { useTheme } from './hooks/useTheme'
 import './App.css'
 
 function App() {
@@ -41,8 +43,12 @@ function App() {
     deleteCategory,
     renameCategory,
     resetNotebook,
+    exportNotebook,
+    importNotebook,
     filteredCategories,
   } = useNotebook()
+
+  const importInputRef = useRef(null)
 
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
   const [isHeaderCollapsed, setIsHeaderCollapsed] = useState(false)
@@ -51,6 +57,7 @@ function App() {
   const globalSearchRef = useRef(null)
   const categorySearchRef = useRef(null)
   const { history, addToHistory, removeFromHistory, clearHistory } = useSearchHistory()
+  const { theme, setTheme, themes } = useTheme()
 
   const commitSearch = useCallback(
     (query) => {
@@ -92,6 +99,24 @@ function App() {
     [activeSearchTarget, lastSearchTarget, setSearchQuery, setCategorySearchQuery],
   )
 
+  const handleImportClick = useCallback(() => {
+    importInputRef.current?.click()
+  }, [])
+
+  const handleImportFile = useCallback(
+    async (e) => {
+      const file = e.target.files?.[0]
+      e.target.value = ''
+      if (!file) return
+
+      const result = await importNotebook(file)
+      if (result.ok) return
+      if (result.cancelled) return
+      window.alert(result.error ?? '가져오기에 실패했습니다.')
+    },
+    [importNotebook],
+  )
+
   return (
     <div className="app">
       <header className="header">
@@ -105,6 +130,7 @@ function App() {
           onClear={clearHistory}
         />
         <div className="header-actions">
+          <ThemeToggle theme={theme} themes={themes} onChange={setTheme} />
           <button
             type="button"
             className={`btn ${isEditing ? 'btn-active' : ''}`}
@@ -120,6 +146,19 @@ function App() {
               페이지 삭제
             </button>
           )}
+          <button type="button" className="btn btn-ghost" onClick={exportNotebook}>
+            내보내기
+          </button>
+          <button type="button" className="btn btn-ghost" onClick={handleImportClick}>
+            가져오기
+          </button>
+          <input
+            ref={importInputRef}
+            type="file"
+            accept="application/json,.json"
+            hidden
+            onChange={handleImportFile}
+          />
           <button type="button" className="btn btn-ghost" onClick={resetNotebook}>
             초기화
           </button>

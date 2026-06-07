@@ -50,7 +50,7 @@ export default function PageEditor({
         </label>
 
         <label className="split-field comment-panel">
-          <span>설명 (자동 → 주석)</span>
+          <span>설명</span>
           <textarea
             className="split-textarea"
             value={page.text}

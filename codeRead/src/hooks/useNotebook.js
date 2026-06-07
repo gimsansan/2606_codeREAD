@@ -5,6 +5,7 @@ import {
   findEtcCategory,
   resolveSaveCategoryId,
 } from '../utils/categories'
+import { downloadNotebook, readNotebookFile } from '../utils/notebookBackup'
 
 const STORAGE_KEY = 'coderead-notebook'
 
@@ -325,6 +326,33 @@ export function useNotebook() {
     setIsEditing(false)
   }, [])
 
+  const exportNotebook = useCallback(() => {
+    downloadNotebook(notebook)
+  }, [notebook])
+
+  const importNotebook = useCallback(async (file) => {
+    const result = await readNotebookFile(file)
+    if (!result.ok) return result
+
+    if (
+      !window.confirm(
+        '현재 수첩 데이터를 백업 파일로 교체할까요?\n저장되지 않은 변경은 덮어씁니다.',
+      )
+    ) {
+      return { ok: false, cancelled: true }
+    }
+
+    setNotebook(result.data)
+    setActiveCategoryId(result.data.categories[0]?.id ?? null)
+    setActivePageIndex(0)
+    setSearchQueryState('')
+    setCategorySearchQueryState('')
+    setDraftPage(null)
+    setDraftCategoryId('')
+    setIsEditing(false)
+    return { ok: true }
+  }, [])
+
   const filteredCategories = notebook.categories
     .map((cat) => {
       const q = searchQuery.trim().toLowerCase()
@@ -374,6 +402,8 @@ export function useNotebook() {
     deleteCategory,
     renameCategory,
     resetNotebook,
+    exportNotebook,
+    importNotebook,
     filteredCategories,
   }
 }
